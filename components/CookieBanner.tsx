@@ -26,7 +26,7 @@ export default function CookieBanner() {
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 50, opacity: 0 }}
+          exit={{ opacity: 0, y: 50 }}
           transition={{ duration: 0.5 }}
           className="fixed bottom-6 left-6 right-6 md:left-auto md:right-8 md:w-[420px] z-[100] isolate rounded-2xl shadow-2xl overflow-hidden antialiased"
         >
