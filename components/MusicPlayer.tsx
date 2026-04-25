@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { AnimatePresence, motion, useScroll, useMotionValueEvent } from "motion/react";
 import {
   Play,
@@ -55,8 +55,9 @@ export default function MusicPlayer() {
   const gainNodeRef = useRef<GainNode | null>(null);
   const animationRef = useRef<number | undefined>(undefined);
   const visualizerRef = useRef<HTMLDivElement>(null);
+  const drawVisualizerRef = useRef<() => void>(() => {});
 
-  const initAudioContext = () => {
+  const initAudioContext = useCallback(() => {
     if (!audioRef.current) return;
 
     if (!audioContextRef.current) {
@@ -88,9 +89,9 @@ export default function MusicPlayer() {
     if (audioContextRef.current.state === "suspended") {
       audioContextRef.current.resume();
     }
-  };
+  }, [volume]);
 
-  const drawVisualizer = () => {
+  const drawVisualizer = useCallback(() => {
     if (!analyserRef.current || !visualizerRef.current) return;
 
     const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
@@ -117,8 +118,12 @@ export default function MusicPlayer() {
       (bars[i] as HTMLElement).style.height = `${height}px`;
     }
 
-    animationRef.current = requestAnimationFrame(drawVisualizer);
-  };
+    animationRef.current = requestAnimationFrame(() => drawVisualizerRef.current());
+  }, []);
+
+  useEffect(() => {
+    drawVisualizerRef.current = drawVisualizer;
+  }, [drawVisualizer]);
 
   useEffect(() => {
     if (!audioRef.current) return;
@@ -147,7 +152,7 @@ export default function MusicPlayer() {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isPlaying, currentTrackIndex]);
+  }, [currentTrackIndex, drawVisualizer, initAudioContext, isPlaying]);
 
   useEffect(() => {
     if (!playlistContainerRef.current) return;
@@ -304,11 +309,18 @@ export default function MusicPlayer() {
   }
 
   if (error) {
+    const errorMessage =
+      error.kind === "playlist"
+        ? t.musicPlayer.errors.playlist
+        : error.kind === "proxyUnavailable"
+          ? `${t.musicPlayer.errors.proxyUnavailable} (Status: ${error.status})`
+          : t.musicPlayer.errors.unexpected;
+
     return (
       <div className="max-w-5xl mx-auto w-full p-10 relative isolate rounded-3xl shadow-md border border-brand-10/10 bg-brand-60/20 flex flex-col items-center justify-center text-center">
         <AlertCircle size={48} className="text-brand-30 mb-4" />
         <h3 className="text-xl font-bold text-brand-10 mb-2">{t.musicPlayer.failedTitle}</h3>
-        <p className="text-brand-10/70">{error}</p>
+        <p className="text-brand-10/70">{errorMessage}</p>
       </div>
     );
   }

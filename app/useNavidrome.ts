@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useLanguage } from "../components/LanguageProvider";
 
 export interface NavidromeTrack {
   id: string;
@@ -12,11 +11,22 @@ export interface NavidromeTrack {
   coverUrl: string; // Готовая ссылка для <img src="...">
 }
 
+export type NavidromeError =
+  | {
+      kind: "playlist";
+    }
+  | {
+      kind: "proxyUnavailable";
+      status: number;
+    }
+  | {
+      kind: "unexpected";
+    };
+
 export function useNavidrome() {
-  const { t } = useLanguage();
   const [playlist, setPlaylist] = useState<NavidromeTrack[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<NavidromeError | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -35,12 +45,12 @@ export function useNavidrome() {
           // Защита от падения, если сервер возвращает HTML (например, 404 Not Found)
           const contentType = response.headers.get("content-type");
           if (contentType && contentType.includes("application/json")) {
-            throw new Error(t.musicPlayer.errors.playlist);
+            setError({ kind: "playlist" });
           } else {
-            throw new Error(
-              `${t.musicPlayer.errors.proxyUnavailable} (Status: ${response.status})`,
-            );
+            setError({ kind: "proxyUnavailable", status: response.status });
           }
+
+          return;
         }
 
         const tracks: NavidromeTrack[] = await response.json();
@@ -48,7 +58,7 @@ export function useNavidrome() {
       } catch (err) {
         if (!isMounted) return;
         console.error("Navidrome Fetch Error:", err);
-        setError(err instanceof Error ? err.message : t.musicPlayer.errors.unexpected);
+        setError({ kind: "unexpected" });
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -59,7 +69,7 @@ export function useNavidrome() {
     return () => {
       isMounted = false;
     };
-  }, [t]);
+  }, []);
 
   return { playlist, loading, error };
 }

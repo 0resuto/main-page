@@ -9,6 +9,29 @@ interface SubsonicTrack {
   coverArt?: string;
 }
 
+const SAFE_PROXY_RESPONSE_HEADERS = [
+  "accept-ranges",
+  "cache-control",
+  "content-length",
+  "content-range",
+  "content-type",
+  "etag",
+  "last-modified",
+] as const;
+
+function pickProxyResponseHeaders(source: Headers) {
+  const headers = new Headers();
+
+  for (const headerName of SAFE_PROXY_RESPONSE_HEADERS) {
+    const value = source.get(headerName);
+    if (value) {
+      headers.set(headerName, value);
+    }
+  }
+
+  return headers;
+}
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const action = searchParams.get("action");
@@ -69,13 +92,12 @@ export async function GET(request: NextRequest) {
       
       const res = await fetch(`${serverUrl}/rest/${endpoint}${authQuery}&id=${id}${sizeParam}`);
       
-      // Передаем заголовки (Content-Type, Content-Length) обратно в браузер, чтобы плеер работал корректно
-      const headers = new Headers();
-      res.headers.forEach((value, key) => headers.set(key, value));
+      // Пропускаем только заголовки, которые реально нужны браузеру для media/image response.
+      const headers = pickProxyResponseHeaders(res.headers);
 
       return new NextResponse(res.body, { status: res.status, headers });
     }
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Ошибка проксирования Navidrome" }, { status: 500 });
   }
 }

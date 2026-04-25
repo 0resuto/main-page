@@ -20,16 +20,17 @@ export function LanguageProvider({
   children: React.ReactNode;
   initialLocale: Locale;
 }) {
-  const [locale, setLocale] = useState<Locale>(initialLocale);
+  const [locale] = useState<Locale>(() => {
+    if (typeof window === "undefined") {
+      return initialLocale;
+    }
+
+    return normalizeLocale(navigator.languages?.[0] || navigator.language);
+  });
 
   useEffect(() => {
-    const browserLocale = normalizeLocale(
-      navigator.languages?.[0] || navigator.language,
-    );
-
-    setLocale(browserLocale);
-    document.documentElement.lang = browserLocale;
-  }, []);
+    document.documentElement.lang = locale;
+  }, [locale]);
 
   const value = useMemo(
     () => ({
