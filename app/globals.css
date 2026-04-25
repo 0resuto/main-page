@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  
+  --color-brand-60: #383a44;
+  --color-brand-30: #e63946;
+  --color-brand-10: #eaeaea;
+  --color-brand-bg: #2b2d34;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply font-sans bg-brand-bg text-brand-10 antialiased;
+  }
+}
+
+@layer utilities {
+  .glass {
+    background-color: color-mix(in srgb, var(--color-brand-bg) 40%, transparent);
+    backdrop-filter: blur(40px) saturate(150%);
+    -webkit-backdrop-filter: blur(40px) saturate(150%);
+  }
+}
+
+.architectural-input {
+  @apply w-full bg-brand-60 border-none rounded-lg focus:ring-0 focus:border-b-2 focus:border-brand-30 h-12 px-4 transition-all text-brand-10;
+}

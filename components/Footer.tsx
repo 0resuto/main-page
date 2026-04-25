@@ -1,0 +1,71 @@
+"use client";
+
+import { useState } from "react";
+import dynamic from "next/dynamic";
+import { Phone, Mail } from "lucide-react";
+import AnchorLink from "./AnchorLink";
+
+const PrivacyModal = dynamic(() => import("./modals/PrivacyModal"));
+
+export default function Footer() {
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
+
+  const config = {
+    PHONE: process.env.NEXT_PUBLIC_PHONE,
+    PHONE_LINK: process.env.NEXT_PUBLIC_PHONE_LINK,
+    EMAIL: process.env.NEXT_PUBLIC_EMAIL
+  };
+
+  return (
+    <>
+      <PrivacyModal isOpen={isPrivacyOpen} onClose={() => setIsPrivacyOpen(false)} />
+      <footer className="w-full py-12 px-6 md:px-12 bg-brand-bg text-brand-10 border-t border-brand-10/10">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-12 mb-16">
+        <div className="space-y-6">
+          <div 
+            className="flex items-center gap-3 group cursor-pointer w-fit"
+            onClick={() => {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              window.history.pushState(null, "", window.location.pathname);
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.svg" alt="Silent Customs" className="h-10 w-auto group-hover:scale-110 transition-transform duration-300" />
+            <div className="text-2xl font-bold tracking-tighter uppercase">0resuto</div>
+          </div>
+          <p className="text-brand-10/70 max-w-xs leading-relaxed">
+            The website is still being worked on, and it keeps getting better.
+          </p>
+        </div>
+        
+        <div className="space-y-6">
+          <h4 className="text-sm font-bold uppercase tracking-widest text-brand-10/50">Curabitur</h4>
+          <div className="flex flex-col gap-3">
+            <AnchorLink className="hover:text-brand-30 transition-colors" href="#about">Home</AnchorLink>
+            <AnchorLink className="hover:text-brand-30 transition-colors" href="#github">GitHub</AnchorLink>
+            <AnchorLink className="hover:text-brand-30 transition-colors" href="#music">Music</AnchorLink>
+          </div>
+        </div>
+
+        {(config.PHONE || config.EMAIL) && (
+          <div className="space-y-6">
+            <h4 className="text-sm font-bold uppercase tracking-widest text-brand-10/50">Phasellus</h4>
+            <div className="space-y-4">
+            {config.PHONE && (
+              <a href={config.PHONE_LINK || `tel:${config.PHONE}`} className="flex items-center gap-3 hover:text-brand-30 transition-colors">
+                <Phone size={18} className="text-brand-30" /> {config.PHONE}
+              </a>
+            )}
+            {config.EMAIL && (
+              <a href={`mailto:${config.EMAIL}`} className="flex items-center gap-3 hover:text-brand-30 transition-colors">
+                <Mail size={18} className="text-brand-30" /> {config.EMAIL}
+              </a>
+            )}
+            </div>
+          </div>
+        )}
+      </div>
+    </footer>
+    </>
+  );
+}
