@@ -65,8 +65,8 @@ export default function Header() {
           }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.svg" alt="0resuto" className="h-12 w-auto group-hover:scale-110 transition-transform duration-300" />
-          <div className="text-xl font-bold tracking-tighter uppercase">0resuto</div>
+          <img src="/logo.svg" alt="0resuto-logo" className="h-12 w-auto group-hover:scale-110 transition-transform duration-300" />
+          <div className="text-xl font-bold tracking-tighter uppercase">Mark Yarovikov</div>
         </div>
         
         <div className="hidden xl:flex items-center gap-4 h-full absolute left-1/2 -translate-x-1/2">

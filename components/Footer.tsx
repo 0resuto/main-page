@@ -31,7 +31,7 @@ export default function Footer() {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.svg" alt="Silent Customs" className="h-10 w-auto group-hover:scale-110 transition-transform duration-300" />
-            <div className="text-2xl font-bold tracking-tighter uppercase">0resuto</div>
+            <div className="text-2xl font-bold tracking-tighter uppercase">Mark Yarovikov</div>
           </div>
           <p className="text-brand-10/70 max-w-xs leading-relaxed">
             The website is still being worked on, and it keeps getting better.
