@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import SmoothScrolling from "../components/SmoothScrolling";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { LanguageProvider } from "../components/LanguageProvider";
+import { normalizeLocale, translations } from "./i18n";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,27 +18,36 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Mark Yarovikov",
-  description: "This is a convenient hub for my services and a place where you can learn about my projects.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = normalizeLocale((await headers()).get("accept-language"));
 
-export default function RootLayout({
+  return {
+    title: "Mark Yarovikov",
+    description: translations[locale].metadataDescription,
+  };
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = normalizeLocale((await headers()).get("accept-language"));
+
   return (
     <html
-      lang="en"
+      lang={locale}
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
       <body className="min-h-screen flex flex-col">
-        <SmoothScrolling>
-          <Header />
-          {children}
-          <Footer />
-        </SmoothScrolling>
+        <LanguageProvider initialLocale={locale}>
+          <SmoothScrolling>
+            <Header />
+            {children}
+            <Footer />
+          </SmoothScrolling>
+        </LanguageProvider>
       </body>
     </html>
   );

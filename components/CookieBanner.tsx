@@ -3,12 +3,13 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Info } from "lucide-react";
+import { useLanguage } from "./LanguageProvider";
 
 export default function CookieBanner() {
   const [isVisible, setIsVisible] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
-    // Проверяем, соглашался ли пользователь ранее
     const consent = localStorage.getItem("cookie_consent");
     if (!consent) {
       setIsVisible(true);
@@ -35,7 +36,7 @@ export default function CookieBanner() {
             <div className="flex items-start gap-4">
               <Info size={24} className="text-brand-30 shrink-0 mt-0.5" />
               <p className="text-sm font-medium text-brand-10/80 leading-relaxed">
-                We use cookies to make our site work better. By continuing to use this website, you agree to our use of cookies.
+                {t.cookieBanner.text}
               </p>
             </div>
             <div className="flex justify-end gap-3">
@@ -43,7 +44,7 @@ export default function CookieBanner() {
                 onClick={acceptCookies}
                 className="px-6 py-2 bg-brand-30 text-brand-10 text-sm font-bold rounded-xl hover:scale-105 active:scale-95 transition-all shadow-lg shadow-brand-30/20"
               >
-                Okay
+                {t.cookieBanner.accept}
               </button>
             </div>
           </div>

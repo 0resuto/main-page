@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLanguage } from "../components/LanguageProvider";
 
 export interface NavidromeTrack {
   id: string;
@@ -12,6 +13,7 @@ export interface NavidromeTrack {
 }
 
 export function useNavidrome() {
+  const { t } = useLanguage();
   const [playlist, setPlaylist] = useState<NavidromeTrack[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,10 +35,11 @@ export function useNavidrome() {
           // Защита от падения, если сервер возвращает HTML (например, 404 Not Found)
           const contentType = response.headers.get("content-type");
           if (contentType && contentType.includes("application/json")) {
-            const errData = await response.json();
-            throw new Error(errData.error || "Failed to receive playlist");
+            throw new Error(t.musicPlayer.errors.playlist);
           } else {
-            throw new Error(`Proxy server not available (Status: ${response.status}). Make sure that route.ts is in app/api/navidrome/`);
+            throw new Error(
+              `${t.musicPlayer.errors.proxyUnavailable} (Status: ${response.status})`,
+            );
           }
         }
 
@@ -45,7 +48,7 @@ export function useNavidrome() {
       } catch (err) {
         if (!isMounted) return;
         console.error("Navidrome Fetch Error:", err);
-        setError(err instanceof Error ? err.message : "An unexpected error occurred");
+        setError(err instanceof Error ? err.message : t.musicPlayer.errors.unexpected);
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -56,7 +59,7 @@ export function useNavidrome() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [t]);
 
   return { playlist, loading, error };
 }
