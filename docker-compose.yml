@@ -1,0 +1,17 @@
+services:
+  website:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_PHONE: ${NEXT_PUBLIC_PHONE}
+        NEXT_PUBLIC_PHONE_LINK: ${NEXT_PUBLIC_PHONE_LINK}
+        NEXT_PUBLIC_EMAIL: ${NEXT_PUBLIC_EMAIL}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+        NEXT_PUBLIC_GITHUB_USERNAME: ${NEXT_PUBLIC_GITHUB_USERNAME}
+    container_name: main-page
+    restart: unless-stopped
+    ports:
+      - "8080:3000"
+    env_file:
+      - .env

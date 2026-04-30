@@ -13,6 +13,7 @@ import {
   VolumeX,
   Shuffle,
 } from "lucide-react";
+import { getOrCreateVisitorId, trackListenedTrack } from "../app/analytics-client";
 import { useNavidrome } from "../app/useNavidrome";
 import { useLanguage } from "./LanguageProvider";
 
@@ -56,6 +57,10 @@ export default function MusicPlayer() {
   const animationRef = useRef<number | undefined>(undefined);
   const visualizerRef = useRef<HTMLDivElement>(null);
   const drawVisualizerRef = useRef<() => void>(() => {});
+  const listenedSecondsRef = useRef(0);
+  const previousAudioTimeRef = useRef(0);
+  const trackListenEventIdRef = useRef<string | null>(null);
+  const trackListenCountedRef = useRef(false);
 
   const initAudioContext = useCallback(() => {
     if (!audioRef.current) return;
@@ -187,6 +192,13 @@ export default function MusicPlayer() {
       window.removeEventListener("resize", handlePlaylistScroll);
     };
   }, [playlist.length]);
+
+  useEffect(() => {
+    listenedSecondsRef.current = 0;
+    previousAudioTimeRef.current = 0;
+    trackListenEventIdRef.current = null;
+    trackListenCountedRef.current = false;
+  }, [currentTrackIndex]);
 
   const handleNext = () => {
     if (!playlist.length) return;
@@ -489,7 +501,41 @@ export default function MusicPlayer() {
                 src={currentTrack.streamUrl}
                 crossOrigin="anonymous"
                 onTimeUpdate={() => {
-                  if (!isDraggingProgress) setProgress(audioRef.current?.currentTime || 0);
+                  const currentTime = audioRef.current?.currentTime || 0;
+
+                  if (!isDraggingProgress) {
+                    setProgress(currentTime);
+                  }
+
+                  if (isPlaying) {
+                    const delta = currentTime - previousAudioTimeRef.current;
+                    if (delta > 0 && delta < 2) {
+                      listenedSecondsRef.current += delta;
+                    }
+                  }
+
+                  previousAudioTimeRef.current = currentTime;
+
+                  if (listenedSecondsRef.current >= 30 && !trackListenCountedRef.current) {
+                    const visitorId = getOrCreateVisitorId();
+                    const eventId =
+                      trackListenEventIdRef.current ||
+                      `track:${visitorId}:${currentTrack.id}:${currentTrackIndex}`;
+
+                    trackListenEventIdRef.current = eventId;
+                    trackListenCountedRef.current = true;
+
+                    trackListenedTrack({
+                      eventId,
+                      visitorId,
+                      trackId: currentTrack.id,
+                      trackTitle: currentTrack.title,
+                      listenedSeconds: listenedSecondsRef.current,
+                    }).catch((analyticsError) => {
+                      console.error("Failed to track listened track:", analyticsError);
+                      trackListenCountedRef.current = false;
+                    });
+                  }
                 }}
                 onLoadedMetadata={() => {
                   setDuration(audioRef.current?.duration || currentTrack.duration);

@@ -51,6 +51,11 @@ export const translations = {
       description: "The website is still being worked on, and it keeps getting better.",
       navigation: "Navigation",
       contacts: "Contacts",
+      stats: "Stats",
+      totalVisits: "All visits",
+      uniqueVisitors: "Unique visitors",
+      listenedTracks: "Tracks listened",
+      statsUnavailable: "Stats are temporarily unavailable.",
     },
     cookieBanner: {
       text:
@@ -106,6 +111,11 @@ export const translations = {
       description: "Сайт всё ещё в разработке и постепенно становится лучше.",
       navigation: "Навигация",
       contacts: "Контакты",
+      stats: "Статистика",
+      totalVisits: "Все посещения",
+      uniqueVisitors: "Уникальные посетители",
+      listenedTracks: "Прослушанные треки",
+      statsUnavailable: "Статистика временно недоступна.",
     },
     cookieBanner: {
       text:

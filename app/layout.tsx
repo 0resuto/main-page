@@ -6,6 +6,7 @@ import SmoothScrolling from "../components/SmoothScrolling";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { LanguageProvider } from "../components/LanguageProvider";
+import VisitTracker from "../components/VisitTracker";
 import { normalizeLocale, translations } from "./i18n";
 
 const geistSans = Geist({
@@ -43,6 +44,7 @@ export default async function RootLayout({
       <body className="min-h-screen flex flex-col">
         <LanguageProvider initialLocale={locale}>
           <SmoothScrolling>
+            <VisitTracker />
             <Header />
             {children}
             <Footer />

@@ -1,15 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { Phone, Mail } from "lucide-react";
 import AnchorLink from "./AnchorLink";
 import { useLanguage } from "./LanguageProvider";
+import { fetchSiteStats, SiteStats } from "../app/analytics-client";
 
 const PrivacyModal = dynamic(() => import("./modals/PrivacyModal"));
 
 export default function Footer() {
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
+  const [stats, setStats] = useState<SiteStats | null>(null);
+  const [statsError, setStatsError] = useState(false);
   const { t } = useLanguage();
 
   const config = {
@@ -18,11 +21,23 @@ export default function Footer() {
     EMAIL: process.env.NEXT_PUBLIC_EMAIL,
   };
 
+  useEffect(() => {
+    fetchSiteStats()
+      .then((data) => {
+        setStats(data);
+        setStatsError(false);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch footer stats:", error);
+        setStatsError(true);
+      });
+  }, []);
+
   return (
     <>
       <PrivacyModal isOpen={isPrivacyOpen} onClose={() => setIsPrivacyOpen(false)} />
       <footer className="w-full py-12 px-6 md:px-12 bg-brand-bg text-brand-10 border-t border-brand-10/10">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-12 mb-16">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 xl:grid-cols-4 gap-12 mb-16">
           <div className="space-y-6">
             <div
               className="flex items-center gap-3 group cursor-pointer w-fit"
@@ -57,6 +72,44 @@ export default function Footer() {
                 {t.nav.music}
               </AnchorLink>
             </div>
+          </div>
+
+          <div className="space-y-6">
+            <h4 className="text-sm font-bold uppercase tracking-widest text-brand-10/50">
+              {t.footer.stats}
+            </h4>
+            {statsError ? (
+              <p className="text-brand-10/60 max-w-xs leading-relaxed">
+                {t.footer.statsUnavailable}
+              </p>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex flex-col">
+                  <span className="text-2xl font-black text-brand-10">
+                    {stats?.total_visits ?? "..."}
+                  </span>
+                  <span className="text-xs uppercase tracking-widest text-brand-10/50 font-bold mt-1">
+                    {t.footer.totalVisits}
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-2xl font-black text-brand-10">
+                    {stats?.unique_visitors ?? "..."}
+                  </span>
+                  <span className="text-xs uppercase tracking-widest text-brand-10/50 font-bold mt-1">
+                    {t.footer.uniqueVisitors}
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-2xl font-black text-brand-10">
+                    {stats?.listened_tracks ?? "..."}
+                  </span>
+                  <span className="text-xs uppercase tracking-widest text-brand-10/50 font-bold mt-1">
+                    {t.footer.listenedTracks}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           {(config.PHONE || config.EMAIL) && (
