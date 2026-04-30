@@ -1,5 +1,5 @@
 fastapi
 uvicorn
-psycopg[pool]
+psycopg[binary,pool]
 pydantic
 python-dotenv
