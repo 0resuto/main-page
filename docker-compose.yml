@@ -1,7 +1,7 @@
 services:
   website:
     build:
-      context: .
+      context: ./frontend
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_PHONE: ${NEXT_PUBLIC_PHONE}
