@@ -128,9 +128,18 @@ async def init_db() -> None:
             )
             await cursor.execute(
                 """
-                INSERT INTO analytics_statistics (id)
-                VALUES (1)
-                ON CONFLICT (id) DO NOTHING;
+                INSERT INTO analytics_statistics (id, total_visits, unique_visitors, listened_tracks)
+                SELECT 
+                    1,
+                    (SELECT COUNT(*) FROM analytics_visits),
+                    (SELECT COUNT(*) FROM analytics_visitors),
+                    (SELECT COUNT(*) FROM analytics_track_listens)
+                ON CONFLICT (id) DO UPDATE
+                SET 
+                    total_visits = (SELECT COUNT(*) FROM analytics_visits),
+                    unique_visitors = (SELECT COUNT(*) FROM analytics_visitors),
+                    listened_tracks = (SELECT COUNT(*) FROM analytics_track_listens)
+                WHERE analytics_statistics.total_visits = 0 AND (SELECT COUNT(*) FROM analytics_visits) > 0;
                 """
             )
             

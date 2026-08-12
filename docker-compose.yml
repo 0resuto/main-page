@@ -44,3 +44,4 @@ services:
 
 volumes:
   main_page_postgres_data:
+    name: main_page_postgres_data
