@@ -17,11 +17,19 @@ import { getOrCreateVisitorId, trackListenedTrack } from "../lib/analytics-clien
 import { useNavidrome } from "../hooks/useNavidrome";
 import { useLanguage } from "./LanguageProvider";
 
+function formatTime(time: number) {
+  if (!time || Number.isNaN(time)) return "00:00";
+  const minutes = Math.floor(time / 60).toString().padStart(2, "0");
+  const seconds = Math.floor(time % 60).toString().padStart(2, "0");
+  return `${minutes}:${seconds}`;
+}
+
 export default function MusicPlayer() {
   const { t } = useLanguage();
   const { playlist, loading, error } = useNavidrome();
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [duration, setDuration] = useState(0);
   const progress = useMotionValue(0);
   const progressPercent = useTransform(progress, (p) => {
     const d = duration || (playlist[currentTrackIndex]?.duration || 1);
@@ -29,7 +37,6 @@ export default function MusicPlayer() {
   });
   const progressWidth = useMotionTemplate`${progressPercent}%`;
   const formattedProgress = useTransform(progress, (p) => formatTime(p));
-  const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.8);
   const [isShuffle, setIsShuffle] = useState(false);
   const [isDraggingProgress, setIsDraggingProgress] = useState(false);
@@ -313,12 +320,7 @@ export default function MusicPlayer() {
     }
   };
 
-  const formatTime = (time: number) => {
-    if (!time || Number.isNaN(time)) return "00:00";
-    const minutes = Math.floor(time / 60).toString().padStart(2, "0");
-    const seconds = Math.floor(time % 60).toString().padStart(2, "0");
-    return `${minutes}:${seconds}`;
-  };
+
 
   if (loading) {
     return (
