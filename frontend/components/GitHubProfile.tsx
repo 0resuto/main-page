@@ -1,5 +1,5 @@
-import { Locale } from "../app/i18n";
-import { getGitHubProfilePayload } from "../app/github";
+import { Locale } from "../lib/i18n";
+import { getGitHubProfilePayload } from "../lib/github";
 import GitHubProfileClient from "./GitHubProfileClient";
 
 export default async function GitHubProfile({

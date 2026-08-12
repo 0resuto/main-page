@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { AnimatePresence, motion, useScroll, useMotionValueEvent } from "motion/react";
+import { AnimatePresence, motion, useScroll, useMotionValueEvent, useMotionValue, useTransform, useMotionTemplate } from "motion/react";
 import {
   Play,
   Pause,
@@ -13,8 +13,8 @@ import {
   VolumeX,
   Shuffle,
 } from "lucide-react";
-import { getOrCreateVisitorId, trackListenedTrack } from "../app/analytics-client";
-import { useNavidrome } from "../app/useNavidrome";
+import { getOrCreateVisitorId, trackListenedTrack } from "../lib/analytics-client";
+import { useNavidrome } from "../hooks/useNavidrome";
 import { useLanguage } from "./LanguageProvider";
 
 export default function MusicPlayer() {
@@ -22,7 +22,13 @@ export default function MusicPlayer() {
   const { playlist, loading, error } = useNavidrome();
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const progress = useMotionValue(0);
+  const progressPercent = useTransform(progress, (p) => {
+    const d = duration || (playlist[currentTrackIndex]?.duration || 1);
+    return Math.min(Math.max(0, (p / d) * 100), 100);
+  });
+  const progressWidth = useMotionTemplate`${progressPercent}%`;
+  const formattedProgress = useTransform(progress, (p) => formatTime(p));
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.8);
   const [isShuffle, setIsShuffle] = useState(false);
@@ -240,7 +246,7 @@ export default function MusicPlayer() {
     const bounds = progressContainerRef.current.getBoundingClientRect();
     const percent = Math.max(0, Math.min(1, (e.clientX - bounds.left) / bounds.width));
     const newTime = percent * (duration || playlist[currentTrackIndex]?.duration || 0);
-    setProgress(newTime);
+    progress.set(newTime);
 
     if (commit) {
       audioRef.current.currentTime = newTime;
@@ -340,10 +346,7 @@ export default function MusicPlayer() {
   if (!playlist.length) return null;
 
   const currentTrack = playlist[currentTrackIndex];
-  const progressPercent = Math.min(
-    100,
-    Math.max(0, (progress / (duration || currentTrack.duration || 1)) * 100),
-  );
+
   const miniPlayerActive = hasActivatedMiniPlayer;
 
   return (
@@ -395,7 +398,7 @@ export default function MusicPlayer() {
               </p>
 
               <div className="w-full flex flex-col lg:flex-row items-center gap-1.5 lg:gap-4 text-xs font-bold text-brand-10/50 mb-6">
-                <span className="hidden lg:block w-10 text-right">{formatTime(progress)}</span>
+                <motion.span className="hidden lg:block w-10 text-right">{formattedProgress}</motion.span>
                 <div
                   ref={progressContainerRef}
                   className="w-full lg:flex-1 h-1 bg-brand-10/10 rounded-full relative cursor-pointer hover:bg-brand-10/20 transition-colors touch-none group/progress before:absolute before:-inset-y-2 before:-inset-x-0"
@@ -403,21 +406,21 @@ export default function MusicPlayer() {
                   onPointerMove={handleProgressPointerMove}
                   onPointerUp={handleProgressPointerUp}
                 >
-                  <div
+                  <motion.div
                     className={`absolute top-0 left-0 h-full bg-brand-30 rounded-full ${
                       isDraggingProgress ? "" : "transition-all duration-100"
                     }`}
-                    style={{ width: `${progressPercent}%` }}
+                    style={{ width: progressWidth }}
                   >
                     <div
                       className={`absolute right-0 top-1/2 -translate-y-1/2 w-3.5 h-3.5 lg:w-3 lg:h-3 bg-brand-10 rounded-full shadow-md translate-x-1/2 transition-opacity ${
                         isDraggingProgress ? "opacity-100" : "opacity-0 group-hover/progress:opacity-100"
                       }`}
                     ></div>
-                  </div>
+                  </motion.div>
                 </div>
                 <div className="w-full flex justify-between lg:hidden">
-                  <span>{formatTime(progress)}</span>
+                  <motion.span>{formattedProgress}</motion.span>
                   <span>{formatTime(duration || currentTrack.duration)}</span>
                 </div>
                 <span className="hidden lg:block w-10">{formatTime(duration || currentTrack.duration)}</span>
@@ -504,7 +507,7 @@ export default function MusicPlayer() {
                   const currentTime = audioRef.current?.currentTime || 0;
 
                   if (!isDraggingProgress) {
-                    setProgress(currentTime);
+                    progress.set(currentTime);
                   }
 
                   if (isPlaying) {
@@ -518,15 +521,17 @@ export default function MusicPlayer() {
 
                   if (listenedSecondsRef.current >= 30 && !trackListenCountedRef.current) {
                     const visitorId = getOrCreateVisitorId();
-                    const eventId =
+                    // The deterministic ID acts as an idempotency key to prevent duplicates 
+                    // during React Strict Mode double-mounts and network retries.
+                    const idempotencyKey =
                       trackListenEventIdRef.current ||
                       `track:${visitorId}:${currentTrack.id}:${currentTrackIndex}`;
 
-                    trackListenEventIdRef.current = eventId;
+                    trackListenEventIdRef.current = idempotencyKey;
                     trackListenCountedRef.current = true;
 
                     trackListenedTrack({
-                      eventId,
+                      idempotencyKey,
                       visitorId,
                       trackId: currentTrack.id,
                       trackTitle: currentTrack.title,
@@ -632,7 +637,7 @@ export default function MusicPlayer() {
             <div className="xl:hidden absolute bottom-0 left-0 right-0 h-0.5 w-full bg-brand-10/10 z-[60]">
               <motion.div
                 className="h-full bg-brand-30"
-                animate={{ width: `${progressPercent}%` }}
+                style={{ width: progressWidth }}
                 transition={{ duration: isDraggingProgress ? 0 : 0.12 }}
               />
             </div>
@@ -678,14 +683,14 @@ export default function MusicPlayer() {
                             </div>
                           </div>
                           <div className="hidden text-[11px] font-bold text-brand-10/45 xl:block shrink-0 pb-0.5">
-                            {formatTime(progress)} / {formatTime(duration || currentTrack.duration)}
+                            <motion.span>{formattedProgress}</motion.span> / <span>{formatTime(duration || currentTrack.duration)}</span>
                           </div>
                         </div>
 
                         <div className="hidden xl:block mt-1.5 h-0.5 w-full overflow-hidden rounded-full bg-brand-10/10">
                           <motion.div
                             className="h-full rounded-full bg-brand-30"
-                            animate={{ width: `${progressPercent}%` }}
+                            style={{ width: progressWidth }}
                             transition={{ duration: isDraggingProgress ? 0 : 0.12 }}
                           />
                         </div>

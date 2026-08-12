@@ -2,8 +2,8 @@
 
 import { motion } from "motion/react";
 import { Github, Star } from "lucide-react";
-import { Locale, translations } from "../app/i18n";
-import { GitHubProfileData, GitHubRepoData } from "../app/github";
+import { Locale, translations } from "../lib/i18n";
+import { GitHubProfileData, GitHubRepoData } from "../lib/github";
 
 export default function GitHubProfileClient({
   locale,

@@ -51,3 +51,8 @@ backend/*.pyd
 backend/.pytest_cache/
 backend/coverage/
 backend/.coverage
+
+# ========================
+# Agents
+# ========================
+.agents/

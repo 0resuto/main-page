@@ -46,7 +46,7 @@ export function getOrCreateVisitorId() {
 }
 
 export async function trackVisit(visit: {
-  eventId: string;
+  idempotencyKey: string;
   visitorId: string;
   path: string;
 }) {
@@ -56,7 +56,7 @@ export async function trackVisit(visit: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      event_id: visit.eventId,
+      idempotency_key: visit.idempotencyKey,
       visitor_id: visit.visitorId,
       path: visit.path,
     }),
@@ -64,7 +64,7 @@ export async function trackVisit(visit: {
 }
 
 export async function trackListenedTrack(event: {
-  eventId: string;
+  idempotencyKey: string;
   visitorId: string;
   trackId: string;
   trackTitle: string;
@@ -76,7 +76,7 @@ export async function trackListenedTrack(event: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      event_id: event.eventId,
+      idempotency_key: event.idempotencyKey,
       visitor_id: event.visitorId,
       track_id: event.trackId,
       track_title: event.trackTitle,

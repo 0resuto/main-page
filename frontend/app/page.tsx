@@ -3,7 +3,7 @@ import CookieBanner from "../components/CookieBanner";
 import GitHubProfile from "../components/GitHubProfile";
 import Hero from "../components/Hero";
 import MusicPlayer from "../components/MusicPlayer";
-import { normalizeLocale } from "./i18n";
+import { normalizeLocale } from "../lib/i18n";
 
 export default async function App() {
   const locale = normalizeLocale((await headers()).get("accept-language"));

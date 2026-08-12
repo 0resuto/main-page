@@ -1,18 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Info } from "lucide-react";
 import { useLanguage } from "./LanguageProvider";
 
 export default function CookieBanner() {
-  const [isVisible, setIsVisible] = useState(() => {
-    if (typeof window === "undefined") {
-      return false;
-    }
+  const [isVisible, setIsVisible] = useState(false);
 
-    return !window.localStorage.getItem("cookie_consent");
-  });
+  useEffect(() => {
+    if (!window.localStorage.getItem("cookie_consent")) {
+      setIsVisible(true);
+    }
+  }, []);
   const { t } = useLanguage();
 
   const acceptCookies = () => {

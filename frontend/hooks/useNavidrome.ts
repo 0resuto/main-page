@@ -54,6 +54,7 @@ export function useNavidrome() {
         }
 
         const tracks: NavidromeTrack[] = await response.json();
+        if (!isMounted) return;
         setPlaylist(tracks);
       } catch (err) {
         if (!isMounted) return;

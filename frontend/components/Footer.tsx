@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { Phone, Mail } from "lucide-react";
 import AnchorLink from "./AnchorLink";
 import { useLanguage } from "./LanguageProvider";
-import { fetchSiteStats, SiteStats } from "../app/analytics-client";
+import { fetchSiteStats, SiteStats } from "../lib/analytics-client";
 
 const PrivacyModal = dynamic(() => import("./modals/PrivacyModal"));
 

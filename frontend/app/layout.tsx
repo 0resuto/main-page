@@ -7,7 +7,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { LanguageProvider } from "../components/LanguageProvider";
 import VisitTracker from "../components/VisitTracker";
-import { normalizeLocale, translations } from "./i18n";
+import { normalizeLocale, translations } from "../lib/i18n";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

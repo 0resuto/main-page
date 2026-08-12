@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { DEFAULT_LOCALE, Locale, normalizeLocale, translations } from "../app/i18n";
+import { DEFAULT_LOCALE, Locale, normalizeLocale, translations } from "../lib/i18n";
 
 type LanguageContextValue = {
   locale: Locale;
@@ -20,13 +20,16 @@ export function LanguageProvider({
   children: React.ReactNode;
   initialLocale: Locale;
 }) {
-  const [locale] = useState<Locale>(() => {
-    if (typeof window === "undefined") {
-      return initialLocale;
-    }
+  const [locale, setLocale] = useState<Locale>(initialLocale);
 
-    return normalizeLocale(navigator.languages?.[0] || navigator.language);
-  });
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const browserLocale = normalizeLocale(navigator.languages?.[0] || navigator.language);
+      if (browserLocale !== initialLocale) {
+        setLocale(browserLocale);
+      }
+    }
+  }, [initialLocale]);
 
   useEffect(() => {
     document.documentElement.lang = locale;
