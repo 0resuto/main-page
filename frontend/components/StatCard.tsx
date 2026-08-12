@@ -6,7 +6,6 @@ import { LucideIcon } from "lucide-react";
 const StatCard = ({ value, label, index, icon: Icon, imageUrl, url }: { value: string; label: string; index: number; icon: LucideIcon; imageUrl: string; url?: string }) => {
   const content = (
     <>
-      {/* Стекло лежит на заднем плане (в начале DOM), контент расположен поверх него благодаря z-10 */}
       <div className={`absolute inset-0 glass backdrop-blur-md bg-brand-60/30 transition-colors duration-300 pointer-events-none rounded-2xl border border-brand-10/10 ${url ? 'group-hover:border-brand-30/50 group-hover:bg-brand-60/50' : ''}`}></div>
       <div className="relative z-10 p-4 lg:p-8 flex-1 flex flex-row lg:flex-col items-center lg:items-start gap-4 lg:gap-0">
         <Icon size={32} className="text-brand-30 lg:mb-4 shrink-0" />

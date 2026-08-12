@@ -5,10 +5,10 @@ export interface NavidromeTrack {
   title: string;
   artist: string;
   album: string;
-  duration: number; // в секундах
+  duration: number; // in seconds
   coverArt: string;
-  streamUrl: string; // Готовая ссылка для <audio src="...">
-  coverUrl: string; // Готовая ссылка для <img src="...">
+  streamUrl: string;
+  coverUrl: string;
 }
 
 export type NavidromeError =
@@ -36,13 +36,12 @@ export function useNavidrome() {
       setError(null);
 
       try {
-        // Обращаемся к нашему безопасному внутреннему API-прокси
         const response = await fetch(`/api/navidrome?action=playlist`);
 
         if (!isMounted) return;
 
         if (!response.ok) {
-          // Защита от падения, если сервер возвращает HTML (например, 404 Not Found)
+          // Crash protection if the server returns HTML (e.g., 404 Not Found)
           const contentType = response.headers.get("content-type");
           if (contentType && contentType.includes("application/json")) {
             setError({ kind: "playlist" });

@@ -1,96 +1,79 @@
 # Main Page Project
 
-Проект состоит из клиентской части на **Next.js** и сервиса аналитики на **FastAPI** с использованием **PostgreSQL**.
+The project consists of a **Next.js** client application and an analytics service built with **FastAPI** using **PostgreSQL**.
 
-## Структура проекта
+## Project Structure
 
-- `/frontend` — Пользовательский интерфейс (Next.js, Tailwind CSS 4, Framer Motion, Lenis).
-- `/backend` — API для сбора аналитики (FastAPI, Psycopg, PostgreSQL).
+- `/frontend` — User interface (Next.js, Tailwind CSS, Framer Motion, Lenis).
+- `/backend` — API for analytics collection (FastAPI, Psycopg, PostgreSQL).
 
-## Требования к окружению
+## Environment Requirements
 
-- Node.js (версия 20 или выше)
-- Python (версия 3.10 или выше)
+- Node.js (version 20 or higher)
+- Python (version 3.10 or higher)
 - PostgreSQL
-- Docker (для контейнеризации фронтенда)
+- Docker (for containerization)
 
----
+## Environment Variables (.env)
 
-## Настройка переменных окружения (.env)
+The project uses split secrets. You need to create `.env` files based on the `.env.example` templates:
 
-В проекте используется разделение секретов. Вам необходимо создать два файла `.env`:
+1. Create a `.env` file in the root for docker-compose.
+2. Create a `frontend/.env` file for frontend variables.
+3. Create a `backend/.env` file and make sure to specify the database connection string.
 
-### 1. `frontend/.env`
-Создайте файл `frontend/.env` для переменных фронтенда. 
-*(Сюда можно добавить публичные переменные с префиксом `NEXT_PUBLIC_`, если они нужны)*
+## Running the Backend (FastAPI)
 
-### 2. `backend/.env`
-Создайте файл `backend/.env` и обязательно укажите строку подключения к базе данных аналитики:
-```env
-# Обязательная переменная для подключения к PostgreSQL
-ANALYTICS_DATABASE_URL=postgresql://user:password@localhost:5432/analytics_db
+The backend automatically creates the necessary tables in PostgreSQL upon startup.
 
-# Опционально: разрешенные источники для CORS (по умолчанию разрешен localhost:3000)
-ANALYTICS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
-```
-
----
-
-## Запуск Бэкенда (FastAPI)
-
-Бэкенд автоматически создает необходимые таблицы в PostgreSQL при запуске.
-
-1. Перейдите в папку бэкенда:
+1. Navigate to the backend folder:
    ```bash
    cd backend
    ```
-2. Создайте и активируйте виртуальное окружение:
+2. Create and activate a virtual environment:
    ```bash
    python -m venv venv
-   
-   # Для Windows:
-   venv\Scripts\activate
-   # Для macOS/Linux:
-   source venv/bin/activate
+   source venv/bin/activate  # macOS/Linux
+   venv\Scripts\activate     # Windows
    ```
-3. Установите зависимости:
+3. Install dependencies:
    ```bash
-   pip install fastapi uvicorn psycopg[pool] pydantic python-dotenv
+   pip install -r requirements.txt
    ```
-4. Запустите сервер для разработки:
+4. Run the development server:
    ```bash
-   uvicorn main:app --reload --port 8000
+   uvicorn main:app --reload
    ```
-API будет доступно по адресу `http://localhost:8000`. Интерактивная документация Swagger: `http://localhost:8000/docs`.
 
-### API Endpoints
-- `GET /health` — Проверка статуса сервера.
-- `POST /analytics/visits` — Запись информации о посещении страницы.
-- `POST /analytics/track-listens` — Запись информации о прослушивании треков (минимум 30 секунд).
-- `GET /analytics/stats` — Получение статистики сайта (визиты, уникальные посетители, прослушивания).
+The API will be available at `http://localhost:8000`. Interactive Swagger documentation: `http://localhost:8000/docs`.
 
----
+### Available Endpoints
+- `GET /health` — Check server status.
+- `POST /analytics/visits` — Record page visit information.
+- `POST /analytics/track-listens` — Record track listen information.
+- `GET /analytics/stats` — Get site statistics.
 
-## Запуск Фронтенда (Next.js)
+## Running the Frontend (Next.js)
 
-### Локальная разработка
-1. Перейдите в папку фронтенда:
+### Local Development
+1. Navigate to the frontend folder:
    ```bash
    cd frontend
    ```
-2. Установите зависимости:
+2. Install dependencies:
    ```bash
    npm install
    ```
-3. Запустите сервер разработки:
+3. Run the development server:
    ```bash
    npm run dev
    ```
-Сайт будет доступен по адресу `http://localhost:3000`.
 
-### Запуск через Docker (Production)
-Фронтенд настроен на многоэтапную (multi-stage) сборку для оптимизации размера образа. Вы можете запустить его одной командой из корня проекта:
+The site will be available at `http://localhost:3000`.
+
+### Running via Docker (Production)
+The frontend is configured for a multi-stage build to optimize image size. You can run it with a single command from the root of the project:
+
 ```bash
-docker-compose up --build -d
+docker-compose up -d --build
 ```
-Приложение будет работать в фоновом режиме и пробросит порт `8080` (доступно по `http://localhost:8080`).

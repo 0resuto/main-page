@@ -6,10 +6,10 @@ import Lenis from "lenis";
 export default function SmoothScrolling({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const lenis = new Lenis({
-      duration: 0.8, // Длительность инерции
-      easing: (t) => Math.min(1, 1 - Math.pow(1 - t, 3) + t * 0.005), // Убираем долгий хвост (эффект примагничивания)
+      duration: 0.8,
+      easing: (t) => Math.min(1, 1 - Math.pow(1 - t, 3) + t * 0.005), // Remove long tail (magnetic effect)
       smoothWheel: true,
-      wheelMultiplier: 1.0, // Увеличивает или уменьшает скорость/шаг прокрутки
+      wheelMultiplier: 1.0,
     });
 
     function raf(time: number) {
