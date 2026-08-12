@@ -81,6 +81,17 @@ async def init_db() -> None:
                 );
                 """
             )
+            # Auto-migrate event_id to idempotency_key if it exists (for backwards compatibility)
+            for table_name in ["analytics_visits", "analytics_track_listens"]:
+                await cursor.execute(
+                    "SELECT column_name FROM information_schema.columns WHERE table_name=%s AND column_name='event_id';",
+                    (table_name,)
+                )
+                if await cursor.fetchone():
+                    await cursor.execute(f"ALTER TABLE {table_name} RENAME COLUMN event_id TO idempotency_key;")
+                    await cursor.execute(f"ALTER TABLE {table_name} DROP CONSTRAINT IF EXISTS {table_name}_event_id_key;")
+                    await cursor.execute(f"ALTER TABLE {table_name} ADD CONSTRAINT {table_name}_idempotency_key_key UNIQUE (idempotency_key);")
+
             await cursor.execute(
                 """
                 CREATE TABLE IF NOT EXISTS analytics_visits (

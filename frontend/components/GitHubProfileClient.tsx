@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import { Github, Star } from "lucide-react";
+import Image from "next/image";
 import { Locale, translations } from "../lib/i18n";
 import { GitHubProfileData, GitHubRepoData } from "../lib/github";
 
@@ -52,22 +53,21 @@ export default function GitHubProfileClient({
 
         <div className="relative z-10 p-8 md:p-10">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-            <a
-              href={profile.html_url}
-              target="_blank"
-              rel="noopener noreferrer"
+            <div
               className="shrink-0 relative block group/avatar cursor-pointer"
+              onClick={() => window.open(profile.html_url, "_blank")}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={profile.avatar_url}
                 alt={profile.login}
+                width={144}
+                height={144}
                 className="w-28 h-28 md:w-36 md:h-36 rounded-full border-2 border-brand-10/20 group-hover/avatar:border-brand-30/50 transition-colors object-cover bg-brand-bg"
               />
               <div className="absolute -bottom-2 -right-2 bg-brand-60 p-3 rounded-full border border-brand-10/10 text-brand-30 shadow-lg group-hover/avatar:scale-110 transition-transform">
                 <Github size={24} />
               </div>
-            </a>
+            </div>
 
             <div className="flex-1 text-center md:text-left flex flex-col justify-center">
               <a
