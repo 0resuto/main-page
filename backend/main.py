@@ -139,7 +139,9 @@ async def init_db() -> None:
                     total_visits = (SELECT COUNT(*) FROM analytics_visits),
                     unique_visitors = (SELECT COUNT(*) FROM analytics_visitors),
                     listened_tracks = (SELECT COUNT(*) FROM analytics_track_listens)
-                WHERE analytics_statistics.total_visits = 0 AND (SELECT COUNT(*) FROM analytics_visits) > 0;
+                WHERE analytics_statistics.total_visits < (SELECT COUNT(*) FROM analytics_visits)
+                   OR analytics_statistics.unique_visitors < (SELECT COUNT(*) FROM analytics_visitors)
+                   OR analytics_statistics.listened_tracks < (SELECT COUNT(*) FROM analytics_track_listens);
                 """
             )
             
