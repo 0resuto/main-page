@@ -28,6 +28,7 @@ export const translations = {
       },
     },
     github: {
+      contributions: "Contributions",
       repositories: "repositories",
       followers: "followers",
       noDescription: "No description",
@@ -88,6 +89,7 @@ export const translations = {
       },
     },
     github: {
+      contributions: "Активность",
       repositories: "репозиториев",
       followers: "подписчиков",
       noDescription: "Описание отсутствует",

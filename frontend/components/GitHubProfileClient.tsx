@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { Github, Star } from "lucide-react";
 import Image from "next/image";
+import { GitHubCalendar } from "react-github-calendar";
 import { Locale, translations } from "../lib/i18n";
 import { GitHubProfileData, GitHubRepoData } from "../lib/github";
 
@@ -103,8 +104,26 @@ export default function GitHubProfileClient({
             </div>
           </div>
 
+          <div className="mt-8 pt-8 border-t border-brand-10/10">
+            <h4 className="text-sm font-bold uppercase tracking-widest text-brand-10/50 mb-6 text-center md:text-left">
+              {t.contributions}
+            </h4>
+            <div className="w-full overflow-x-auto overflow-y-hidden pb-4 custom-scrollbar">
+              <div className="min-w-[700px] flex justify-center md:justify-start">
+                <GitHubCalendar
+                  username={profile.login}
+                  colorScheme="dark"
+                  theme={{
+                    dark: ["#3a3d46", "#4a3940", "#7a3a45", "#c93e50", "#e8384a"]
+                  }}
+                  hideTotalCount
+                />
+              </div>
+            </div>
+          </div>
+
           {repos.length > 0 && (
-            <div className="mt-10 pt-8 border-t border-brand-10/10 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="mt-8 pt-8 border-t border-brand-10/10 grid grid-cols-1 md:grid-cols-3 gap-4">
               {repos.map((repo) => (
                 <a
                   key={repo.id}
