@@ -96,3 +96,26 @@ export async function fetchSiteStats() {
 
   return (await response.json()) as SiteStats;
 }
+
+export interface MetricHistoryItem {
+  date: string;
+  count: number;
+}
+
+export interface StatsHistoryOut {
+  visits: MetricHistoryItem[];
+  unique_visitors: MetricHistoryItem[];
+  listened_tracks: MetricHistoryItem[];
+}
+
+export async function fetchStatsHistory() {
+  const response = await fetch(`${getAnalyticsApiUrl()}/analytics/stats-history`, {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch stats history: ${response.status}`);
+  }
+
+  return (await response.json()) as StatsHistoryOut;
+}

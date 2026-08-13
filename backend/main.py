@@ -1,6 +1,11 @@
 from __future__ import annotations
 
 import os
+import sys
+import asyncio
+
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 
@@ -60,6 +65,15 @@ class SiteStatsOut(BaseModel):
     total_visits: int
     unique_visitors: int
     listened_tracks: int
+
+class MetricHistoryItem(BaseModel):
+    date: str
+    count: int
+
+class StatsHistoryOut(BaseModel):
+    visits: list[MetricHistoryItem]
+    unique_visitors: list[MetricHistoryItem]
+    listened_tracks: list[MetricHistoryItem]
 
 pool = AsyncConnectionPool(
     conninfo=settings.database_url,
@@ -321,3 +335,56 @@ async def get_stats() -> SiteStatsOut:
         )
 
     return SiteStatsOut(**row)
+
+@app.get("/analytics/stats-history", response_model=StatsHistoryOut)
+async def get_stats_history() -> StatsHistoryOut:
+    async with pool.connection() as connection:
+        async with connection.cursor() as cursor:
+            # Visits
+            await cursor.execute(
+                """
+                SELECT DATE_TRUNC('week', created_at) as date, COUNT(*) as count
+                FROM analytics_visits
+                WHERE created_at > NOW() - INTERVAL '180 days'
+                GROUP BY DATE_TRUNC('week', created_at)
+                ORDER BY date ASC;
+                """
+            )
+            visits_rows = await cursor.fetchall()
+
+            # Unique Visitors (active visitors per day)
+            await cursor.execute(
+                """
+                SELECT DATE_TRUNC('week', created_at) as date, COUNT(DISTINCT visitor_id) as count
+                FROM analytics_visits
+                WHERE created_at > NOW() - INTERVAL '180 days'
+                GROUP BY DATE_TRUNC('week', created_at)
+                ORDER BY date ASC;
+                """
+            )
+            unique_rows = await cursor.fetchall()
+
+            # Listened Tracks
+            await cursor.execute(
+                """
+                SELECT DATE_TRUNC('week', created_at) as date, COUNT(*) as count
+                FROM analytics_track_listens
+                WHERE created_at > NOW() - INTERVAL '180 days'
+                GROUP BY DATE_TRUNC('week', created_at)
+                ORDER BY date ASC;
+                """
+            )
+            tracks_rows = await cursor.fetchall()
+
+    def format_rows(rows):
+        return [{"date": str(r["date"]), "count": r["count"]} for r in rows]
+
+    return StatsHistoryOut(
+        visits=format_rows(visits_rows),
+        unique_visitors=format_rows(unique_rows),
+        listened_tracks=format_rows(tracks_rows),
+    )
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

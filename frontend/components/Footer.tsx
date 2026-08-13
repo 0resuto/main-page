@@ -5,13 +5,15 @@ import dynamic from "next/dynamic";
 import { Phone, Mail } from "lucide-react";
 import AnchorLink from "./AnchorLink";
 import { useLanguage } from "./LanguageProvider";
-import { fetchSiteStats, SiteStats } from "../lib/analytics-client";
+import { fetchSiteStats, SiteStats, fetchStatsHistory, StatsHistoryOut } from "../lib/analytics-client";
+import Sparkline from "./Sparkline";
 
 const PrivacyModal = dynamic(() => import("./modals/PrivacyModal"));
 
 export default function Footer() {
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   const [stats, setStats] = useState<SiteStats | null>(null);
+  const [history, setHistory] = useState<StatsHistoryOut | null>(null);
   const [statsError, setStatsError] = useState(false);
   const { t } = useLanguage();
 
@@ -22,9 +24,10 @@ export default function Footer() {
   };
 
   useEffect(() => {
-    fetchSiteStats()
-      .then((data) => {
-        setStats(data);
+    Promise.all([fetchSiteStats(), fetchStatsHistory()])
+      .then(([statsData, historyData]) => {
+        setStats(statsData);
+        setHistory(historyData);
         setStatsError(false);
       })
       .catch((error) => {
@@ -83,30 +86,53 @@ export default function Footer() {
                 {t.footer.statsUnavailable}
               </p>
             ) : (
-              <div className="space-y-4">
-                <div className="flex flex-col">
-                  <span className="text-2xl font-black text-brand-10">
-                    {stats?.total_visits ?? "..."}
-                  </span>
-                  <span className="text-xs uppercase tracking-widest text-brand-10/50 font-bold mt-1">
-                    {t.footer.totalVisits}
-                  </span>
+              <div className="space-y-6">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex flex-col">
+                    <span className="text-2xl font-black text-brand-10">
+                      {stats?.total_visits ?? "..."}
+                    </span>
+                    <span className="text-xs uppercase tracking-widest text-brand-10/50 font-bold mt-1">
+                      {t.footer.totalVisits}
+                    </span>
+                  </div>
+                  {history && (
+                    <div className="flex-shrink-0">
+                      <Sparkline data={history.visits} height={40} width={140} />
+                    </div>
+                  )}
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-2xl font-black text-brand-10">
-                    {stats?.unique_visitors ?? "..."}
-                  </span>
-                  <span className="text-xs uppercase tracking-widest text-brand-10/50 font-bold mt-1">
-                    {t.footer.uniqueVisitors}
-                  </span>
+                
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex flex-col">
+                    <span className="text-2xl font-black text-brand-10">
+                      {stats?.unique_visitors ?? "..."}
+                    </span>
+                    <span className="text-xs uppercase tracking-widest text-brand-10/50 font-bold mt-1">
+                      {t.footer.uniqueVisitors}
+                    </span>
+                  </div>
+                  {history && (
+                    <div className="flex-shrink-0">
+                      <Sparkline data={history.unique_visitors} height={40} width={140} />
+                    </div>
+                  )}
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-2xl font-black text-brand-10">
-                    {stats?.listened_tracks ?? "..."}
-                  </span>
-                  <span className="text-xs uppercase tracking-widest text-brand-10/50 font-bold mt-1">
-                    {t.footer.listenedTracks}
-                  </span>
+                
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex flex-col">
+                    <span className="text-2xl font-black text-brand-10">
+                      {stats?.listened_tracks ?? "..."}
+                    </span>
+                    <span className="text-xs uppercase tracking-widest text-brand-10/50 font-bold mt-1">
+                      {t.footer.listenedTracks}
+                    </span>
+                  </div>
+                  {history && (
+                    <div className="flex-shrink-0">
+                      <Sparkline data={history.listened_tracks} height={40} width={140} />
+                    </div>
+                  )}
                 </div>
               </div>
             )}
