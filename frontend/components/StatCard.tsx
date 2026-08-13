@@ -7,14 +7,14 @@ const StatCard = ({ value, label, index, icon: Icon, imageUrl, url }: { value: s
   const content = (
     <>
       <div className={`absolute inset-0 glass backdrop-blur-md bg-brand-60/30 transition-colors duration-300 pointer-events-none rounded-2xl border border-brand-10/10 ${url ? 'group-hover:border-brand-30/50 group-hover:bg-brand-60/50' : ''}`}></div>
-      <div className="relative z-10 p-4 lg:p-8 flex-1 flex flex-row lg:flex-col items-center lg:items-start gap-4 lg:gap-0">
-        <Icon size={32} className="text-brand-30 lg:mb-4 shrink-0" />
+      <div className="relative z-10 p-4 lg:p-6 flex-1 flex flex-row lg:flex-col items-center lg:items-start gap-4 lg:gap-0">
+        <Icon size={28} className="text-brand-30 lg:mb-4 shrink-0" />
         <div>
-          <div className="text-2xl lg:text-4xl font-extrabold tracking-tighter text-brand-10 mb-1 lg:mb-2">{value}</div>
-          <div className="text-xs lg:text-sm font-medium text-brand-10/80 uppercase tracking-wider">{label}</div>
+          <div className="text-xl lg:text-3xl font-extrabold tracking-tighter text-brand-10 mb-1 lg:mb-2">{value}</div>
+          <div className="text-[11px] lg:text-xs font-medium text-brand-10/80 uppercase tracking-wider">{label}</div>
         </div>
       </div>
-      <div className="relative z-10 w-1/6 lg:w-1/4 m-4 lg:m-8 flex items-center justify-center">
+      <div className="relative z-10 w-1/6 lg:w-1/4 my-4 lg:my-6 mr-4 lg:mr-6 ml-2 flex items-center justify-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={imageUrl} alt={label} className="max-w-full max-h-full object-contain" />
       </div>

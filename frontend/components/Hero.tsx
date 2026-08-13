@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "motion/react";
-import { Cloud, Music, Film } from "lucide-react";
+import { Cloud, Music, Film, CarFront } from "lucide-react";
 import StatCard from "./StatCard";
 import { useLanguage } from "./LanguageProvider";
 
@@ -47,11 +47,19 @@ export default function Hero() {
       </div>
 
       <motion.div className="relative z-10 max-w-7xl mx-auto w-full mt-8" style={{ y: cardsY }}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard
+            value={t.hero.cards.racing}
+            label="Cold Mirror"
+            index={0}
+            icon={CarFront}
+            imageUrl="/images/logo/iracing-logo.webp"
+            url="https://racing.markyarovikov.ru"
+          />
           <StatCard
             value={t.hero.cards.cloud}
             label="Nextcloud"
-            index={0}
+            index={1}
             icon={Cloud}
             imageUrl="/images/logo/nextcloud-logo.webp"
             url="https://cloud.markyarovikov.ru"
@@ -59,17 +67,17 @@ export default function Hero() {
           <StatCard
             value={t.hero.cards.music}
             label="Navidrome"
-            index={1}
+            index={2}
             icon={Music}
             imageUrl="/images/logo/navidrome-logo.webp"
             url="https://music.markyarovikov.ru"
           />
           <StatCard
             value={t.hero.cards.films}
-            label="Yamtrack"
-            index={2}
+            label="Wekan"
+            index={3}
             icon={Film}
-            imageUrl="/images/logo/yamtrack-logo.webp"
+            imageUrl="/images/logo/wekan-logo.webp"
             url="https://films.markyarovikov.ru"
           />
         </div>

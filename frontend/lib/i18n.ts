@@ -24,6 +24,7 @@ export const translations = {
         cloud: "Cloud",
         music: "Music",
         films: "Films",
+        racing: "Simracing",
       },
     },
     github: {
@@ -83,6 +84,7 @@ export const translations = {
         cloud: "Облако",
         music: "Музыка",
         films: "Фильмы",
+        racing: "Симрейсинг",
       },
     },
     github: {
