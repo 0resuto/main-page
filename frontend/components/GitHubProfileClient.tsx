@@ -117,7 +117,7 @@ export default function GitHubProfileClient({
                   theme={{
                     dark: ["#3a3d46", "#4a3940", "#7a3a45", "#c93e50", "#e8384a"]
                   }}
-                  hideTotalCount
+                  showTotalCount={false}
                 />
               </div>
             </div>
