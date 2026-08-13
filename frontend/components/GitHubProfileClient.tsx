@@ -3,7 +3,7 @@
 import { motion } from "motion/react";
 import { Github, Star } from "lucide-react";
 import Image from "next/image";
-import { GitHubCalendar } from "react-github-calendar";
+import { ActivityCalendar } from "react-activity-calendar";
 import { Locale, translations } from "../lib/i18n";
 import { GitHubProfileData, GitHubRepoData } from "../lib/github";
 
@@ -11,11 +11,13 @@ export default function GitHubProfileClient({
   locale,
   profile,
   repos,
+  contributions,
   error,
 }: {
   locale: Locale;
   profile: GitHubProfileData | null;
   repos: GitHubRepoData[];
+  contributions: any[];
   error: string | null;
 }) {
   const t = translations[locale].github;
@@ -63,7 +65,6 @@ export default function GitHubProfileClient({
                 alt={profile.login}
                 width={144}
                 height={144}
-                unoptimized
                 className="w-28 h-28 md:w-36 md:h-36 rounded-full border-2 border-brand-10/20 group-hover/avatar:border-brand-30/50 transition-colors object-cover bg-brand-bg"
               />
               <div className="absolute -bottom-2 -right-2 bg-brand-60 p-3 rounded-full border border-brand-10/10 text-brand-30 shadow-lg group-hover/avatar:scale-110 transition-transform">
@@ -111,8 +112,8 @@ export default function GitHubProfileClient({
             </h4>
             <div className="w-full overflow-x-auto overflow-y-hidden pb-4 custom-scrollbar">
               <div className="min-w-[700px] flex justify-center md:justify-start">
-                <GitHubCalendar
-                  username={profile.login}
+                <ActivityCalendar
+                  data={contributions}
                   colorScheme="dark"
                   theme={{
                     dark: ["#3a3d46", "#4a3940", "#7a3a45", "#c93e50", "#e8384a"]

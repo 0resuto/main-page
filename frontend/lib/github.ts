@@ -26,11 +26,13 @@ export type GitHubProfilePayload =
   | {
       profile: GitHubProfileData;
       repos: GitHubRepoData[];
+      contributions: any[];
       error: null;
     }
   | {
       profile: null;
       repos: [];
+      contributions: [];
       error: string;
     };
 
@@ -49,29 +51,33 @@ export async function getGitHubProfilePayload(
       },
     } as const;
 
-    const [profileRes, reposRes] = await Promise.all([
+    const [profileRes, reposRes, contribRes] = await Promise.all([
       fetch(`https://api.github.com/users/${username}`, requestInit),
       fetch(
         `https://api.github.com/users/${username}/repos?per_page=100&sort=pushed`,
         requestInit,
       ),
+      fetch(`https://github-contributions-api.jogruber.de/v4/${username}?y=last`, requestInit),
     ]);
 
     if (!profileRes.ok) {
       return {
         profile: null,
         repos: [],
+        contributions: [],
         error: profileRes.status === 404 ? t.errors.notFound : t.errors.api,
       };
     }
 
     const profileData = (await profileRes.json()) as GitHubProfileData;
     const reposData = reposRes.ok ? ((await reposRes.json()) as GitHubRepoData[]) : [];
+    const contribData = contribRes.ok ? await contribRes.json() : { contributions: [] };
 
     if (!profileData?.login) {
       return {
         profile: null,
         repos: [],
+        contributions: [],
         error: t.errors.profileDataFailed,
       };
     }
@@ -86,6 +92,7 @@ export async function getGitHubProfilePayload(
     return {
       profile: profileData,
       repos: topRepos,
+      contributions: contribData.contributions || [],
       error: null,
     };
   } catch (error) {
@@ -94,6 +101,7 @@ export async function getGitHubProfilePayload(
     return {
       profile: null,
       repos: [],
+      contributions: [],
       error: t.errors.fetchFailed,
     };
   }

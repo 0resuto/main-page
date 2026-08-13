@@ -16,6 +16,7 @@ export default async function GitHubProfile({
       locale={locale}
       profile={payload.profile}
       repos={payload.repos}
+      contributions={payload.contributions}
       error={payload.error}
     />
   );
