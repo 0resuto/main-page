@@ -36,12 +36,9 @@ def get_settings() -> Settings:
     if not database_url:
         raise RuntimeError("ANALYTICS_DATABASE_URL is not set")
 
-    allowed_origins = split_csv(
-        os.environ.get(
-            "ANALYTICS_ALLOWED_ORIGINS",
-            "http://localhost:3000,http://127.0.0.1:3000,http://localhost:8080,http://127.0.0.1:8080",
-        )
-    )
+    allowed_origins = split_csv(os.environ.get("ANALYTICS_ALLOWED_ORIGINS", ""))
+    if not allowed_origins:
+        raise RuntimeError("ANALYTICS_ALLOWED_ORIGINS is not set")
 
     try:
         retention_days = max(
@@ -57,7 +54,15 @@ def get_settings() -> Settings:
     )
 
 settings = get_settings()
-limiter = Limiter(key_func=get_remote_address)
+
+def get_client_ip(request: Request) -> str:
+    # The public entrypoint is the Next.js proxy, which forwards the client IP.
+    forwarded_for = request.headers.get("x-forwarded-for", "")
+    if forwarded_for:
+        return forwarded_for.split(",")[0].strip()
+    return get_remote_address(request)
+
+limiter = Limiter(key_func=get_client_ip)
 
 class VisitIn(BaseModel):
     idempotency_key: str = Field(min_length=1, max_length=255)

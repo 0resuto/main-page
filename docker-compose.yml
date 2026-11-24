@@ -9,6 +9,8 @@ services:
       - "8080:3000"
     env_file:
       - ./frontend/.env
+    environment:
+      - ANALYTICS_API_URL=http://api:8000
 
   api:
     build:
@@ -17,7 +19,7 @@ services:
     container_name: analytics-api
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     env_file:
       - ./backend/.env
     environment:

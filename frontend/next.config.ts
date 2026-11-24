@@ -3,15 +3,6 @@ import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV !== "production";
 
-const analyticsOrigin = (() => {
-  const raw = process.env.NEXT_PUBLIC_ANALYTICS_API_URL || "http://127.0.0.1:8000";
-  try {
-    return new URL(raw).origin;
-  } catch {
-    return "http://127.0.0.1:8000";
-  }
-})();
-
 const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
@@ -19,7 +10,7 @@ const contentSecurityPolicy = [
   "img-src 'self' data: blob: https://avatars.githubusercontent.com",
   "font-src 'self' data:",
   "media-src 'self' blob:",
-  `connect-src 'self' ${analyticsOrigin}${isDev ? " ws: wss:" : ""}`,
+  `connect-src 'self'${isDev ? " ws: wss:" : ""}`,
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

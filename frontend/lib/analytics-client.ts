@@ -6,13 +6,9 @@ export interface SiteStats {
   listened_tracks: number;
 }
 
-const DEFAULT_ANALYTICS_API_URL = "http://127.0.0.1:8000";
+const ANALYTICS_API_BASE = "/api/analytics";
 const VISITOR_COOKIE_NAME = "site_visitor_id";
 const VISITOR_COOKIE_MAX_AGE = 60 * 60 * 24 * 90;
-
-function getAnalyticsApiUrl() {
-  return process.env.NEXT_PUBLIC_ANALYTICS_API_URL || DEFAULT_ANALYTICS_API_URL;
-}
 
 function readCookie(name: string) {
   if (typeof document === "undefined") return null;
@@ -75,7 +71,7 @@ export async function trackVisit(visit: {
 }) {
   if (!hasAnalyticsConsent()) return;
 
-  await fetch(`${getAnalyticsApiUrl()}/analytics/visits`, {
+  await fetch(`${ANALYTICS_API_BASE}/visits`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -97,7 +93,7 @@ export async function trackListenedTrack(event: {
 }) {
   if (!hasAnalyticsConsent()) return;
 
-  await fetch(`${getAnalyticsApiUrl()}/analytics/track-listens`, {
+  await fetch(`${ANALYTICS_API_BASE}/track-listens`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -113,7 +109,7 @@ export async function trackListenedTrack(event: {
 }
 
 export async function fetchSiteStats() {
-  const response = await fetch(`${getAnalyticsApiUrl()}/analytics/stats`, {
+  const response = await fetch(`${ANALYTICS_API_BASE}/stats`, {
     cache: "no-store",
   });
 
@@ -136,7 +132,7 @@ export interface StatsHistoryOut {
 }
 
 export async function fetchStatsHistory() {
-  const response = await fetch(`${getAnalyticsApiUrl()}/analytics/stats-history`, {
+  const response = await fetch(`${ANALYTICS_API_BASE}/stats-history`, {
     cache: "no-store",
   });
 
