@@ -96,6 +96,8 @@ pool = AsyncConnectionPool(
 async def init_db() -> None:
     async with pool.connection() as connection:
         async with connection.cursor() as cursor:
+            # Serialize DDL across Uvicorn workers and replicas.
+            await cursor.execute("SELECT pg_advisory_xact_lock(hashtext('analytics_init_db'));")
             await cursor.execute(
                 """
                 CREATE TABLE IF NOT EXISTS analytics_visitors (
