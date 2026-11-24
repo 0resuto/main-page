@@ -59,5 +59,17 @@ venv/
 coverage.xml
 nosetests.xml
 
-# Agents
+# AI harness (local-only; never commit)
 .agents/
+.opencode/
+.claude/
+.codex/
+.cursor/
+.windsurf/
+AGENTS.md
+CLAUDE.md
+opencode.json
+opencode.jsonc
+skills-lock.json
+skills-install*.log
+skills-remove.log
