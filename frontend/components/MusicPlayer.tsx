@@ -523,6 +523,9 @@ export default function MusicPlayer() {
 
                   if (listenedSecondsRef.current >= 30 && !trackListenCountedRef.current) {
                     const visitorId = getOrCreateVisitorId();
+                    if (!visitorId) {
+                      return;
+                    }
                     // The deterministic ID acts as an idempotency key to prevent duplicates 
                     // during React Strict Mode double-mounts and network retries.
                     const idempotencyKey =

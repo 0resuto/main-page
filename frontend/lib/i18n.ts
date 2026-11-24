@@ -58,15 +58,15 @@ export const translations = {
       uniqueVisitors: "Unique visitors",
       listenedTracks: "Tracks listened",
       statsUnavailable: "Stats are temporarily unavailable.",
+      privacy: "Privacy policy",
     },
     cookieBanner: {
+      label: "Cookie consent",
       text:
-        "We use cookies to make our site work better. By continuing to use this website, you agree to our use of cookies.",
-      accept: "Okay",
-    },
-    privacyModal: {
-      title: "Privacy policy",
-      placeholder: "The privacy policy text will appear here soon.",
+        "We use a first-party analytics cookie to count visits and understand which content is useful. Analytics runs only if you accept; you can reject and still use the site.",
+      accept: "Accept",
+      reject: "Reject",
+      privacy: "Privacy policy",
     },
   },
   ru: {
@@ -120,15 +120,15 @@ export const translations = {
       uniqueVisitors: "Уникальные посетители",
       listenedTracks: "Прослушанные треки",
       statsUnavailable: "Статистика временно недоступна.",
+      privacy: "Политика конфиденциальности",
     },
     cookieBanner: {
+      label: "Согласие на cookie",
       text:
-        "Мы используем cookie, чтобы сайт работал лучше. Продолжая пользоваться сайтом, вы соглашаетесь с их использованием.",
-      accept: "Понятно",
-    },
-    privacyModal: {
-      title: "Политика конфиденциальности",
-      placeholder: "Текст политики конфиденциальности появится здесь позже.",
+        "Мы используем собственный аналитический cookie, чтобы считать посещения и понимать, какой контент полезен. Аналитика работает только после согласия; вы можете отказаться и пользоваться сайтом.",
+      accept: "Принять",
+      reject: "Отклонить",
+      privacy: "Политика конфиденциальности",
     },
   },
 } as const;

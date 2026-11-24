@@ -1,3 +1,5 @@
+import { hasAnalyticsConsent } from "./consent";
+
 export interface SiteStats {
   total_visits: number;
   unique_visitors: number;
@@ -6,7 +8,7 @@ export interface SiteStats {
 
 const DEFAULT_ANALYTICS_API_URL = "http://127.0.0.1:8000";
 const VISITOR_COOKIE_NAME = "site_visitor_id";
-const VISITOR_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
+const VISITOR_COOKIE_MAX_AGE = 60 * 60 * 24 * 90;
 
 function getAnalyticsApiUrl() {
   return process.env.NEXT_PUBLIC_ANALYTICS_API_URL || DEFAULT_ANALYTICS_API_URL;
@@ -26,21 +28,42 @@ function readCookie(name: string) {
 function writeCookie(name: string, value: string, maxAge: number) {
   if (typeof document === "undefined") return;
 
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+
   document.cookie = [
     `${name}=${encodeURIComponent(value)}`,
     "Path=/",
     `Max-Age=${maxAge}`,
     "SameSite=Lax",
-  ].join("; ");
+  ].join("; ") + secure;
 }
 
-export function getOrCreateVisitorId() {
+export function clearVisitorId() {
+  if (typeof document === "undefined") return;
+
+  document.cookie = `${VISITOR_COOKIE_NAME}=; Path=/; Max-Age=0; SameSite=Lax`;
+}
+
+function createVisitorId() {
+  if (typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+export function getOrCreateVisitorId(): string | null {
+  if (!hasAnalyticsConsent()) {
+    return null;
+  }
+
   const existingVisitorId = readCookie(VISITOR_COOKIE_NAME);
   if (existingVisitorId) {
     return existingVisitorId;
   }
 
-  const visitorId = crypto.randomUUID();
+  const visitorId = createVisitorId();
   writeCookie(VISITOR_COOKIE_NAME, visitorId, VISITOR_COOKIE_MAX_AGE);
   return visitorId;
 }
@@ -50,6 +73,8 @@ export async function trackVisit(visit: {
   visitorId: string;
   path: string;
 }) {
+  if (!hasAnalyticsConsent()) return;
+
   await fetch(`${getAnalyticsApiUrl()}/analytics/visits`, {
     method: "POST",
     headers: {
@@ -70,6 +95,8 @@ export async function trackListenedTrack(event: {
   trackTitle: string;
   listenedSeconds: number;
 }) {
+  if (!hasAnalyticsConsent()) return;
+
   await fetch(`${getAnalyticsApiUrl()}/analytics/track-listens`, {
     method: "POST",
     headers: {

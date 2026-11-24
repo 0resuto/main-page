@@ -1,17 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
 import { Phone, Mail } from "lucide-react";
 import AnchorLink from "./AnchorLink";
 import { useLanguage } from "./LanguageProvider";
 import { fetchSiteStats, SiteStats, fetchStatsHistory, StatsHistoryOut } from "../lib/analytics-client";
 import Sparkline from "./Sparkline";
 
-const PrivacyModal = dynamic(() => import("./modals/PrivacyModal"));
-
 export default function Footer() {
-  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   const [stats, setStats] = useState<SiteStats | null>(null);
   const [history, setHistory] = useState<StatsHistoryOut | null>(null);
   const [statsError, setStatsError] = useState(false);
@@ -37,8 +33,6 @@ export default function Footer() {
   }, []);
 
   return (
-    <>
-      <PrivacyModal isOpen={isPrivacyOpen} onClose={() => setIsPrivacyOpen(false)} />
       <footer className="w-full py-12 px-6 md:px-12 bg-brand-bg text-brand-10 border-t border-brand-10/10">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 xl:grid-cols-4 gap-12 mb-16">
           <div className="space-y-6">
@@ -164,7 +158,12 @@ export default function Footer() {
             </div>
           )}
         </div>
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t border-brand-10/10 pt-8 text-sm text-brand-10/50">
+          <span>© {new Date().getFullYear()} Mark Yarovikov</span>
+          <a href="/privacy" className="hover:text-brand-30 transition-colors">
+            {t.footer.privacy}
+          </a>
+        </div>
       </footer>
-    </>
   );
 }

@@ -8,6 +8,7 @@ if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request, status
@@ -28,6 +29,7 @@ def split_csv(value: str) -> list[str]:
 class Settings:
     database_url: str
     allowed_origins: list[str]
+    retention_days: int
 
 def get_settings() -> Settings:
     database_url = os.environ.get("ANALYTICS_DATABASE_URL", "").strip()
@@ -41,9 +43,17 @@ def get_settings() -> Settings:
         )
     )
 
+    try:
+        retention_days = max(
+            30, min(3650, int(os.environ.get("ANALYTICS_RETENTION_DAYS", "365")))
+        )
+    except ValueError:
+        retention_days = 365
+
     return Settings(
         database_url=database_url,
         allowed_origins=allowed_origins,
+        retention_days=retention_days,
     )
 
 settings = get_settings()
@@ -234,11 +244,48 @@ async def init_db() -> None:
 
         await connection.commit()
 
+async def cleanup_old_data() -> None:
+    cutoff = datetime.now(timezone.utc) - timedelta(days=settings.retention_days)
+
+    async with pool.connection() as connection:
+        async with connection.cursor() as cursor:
+            # Serialize cleanup across Uvicorn workers.
+            await cursor.execute("SELECT pg_advisory_xact_lock(hashtext('analytics_cleanup'));")
+            await cursor.execute("DELETE FROM analytics_visits WHERE created_at < %s;", (cutoff,))
+            await cursor.execute(
+                "DELETE FROM analytics_track_listens WHERE created_at < %s;",
+                (cutoff,),
+            )
+            await cursor.execute(
+                """
+                DELETE FROM analytics_visitors v
+                WHERE v.last_seen_at < %s
+                  AND NOT EXISTS (
+                      SELECT 1 FROM analytics_visits x WHERE x.visitor_id = v.visitor_id
+                  )
+                  AND NOT EXISTS (
+                      SELECT 1 FROM analytics_track_listens t WHERE t.visitor_id = v.visitor_id
+                  );
+                """,
+                (cutoff,),
+            )
+            await cursor.execute(
+                """
+                UPDATE analytics_statistics
+                SET total_visits = (SELECT COUNT(*) FROM analytics_visits),
+                    unique_visitors = (SELECT COUNT(*) FROM analytics_visitors),
+                    listened_tracks = (SELECT COUNT(*) FROM analytics_track_listens)
+                WHERE id = 1;
+                """
+            )
+        await connection.commit()
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     await pool.open(wait=True)
-    await init_db()
     try:
+        await init_db()
+        await cleanup_old_data()
         yield
     finally:
         await pool.close()
