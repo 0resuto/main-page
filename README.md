@@ -9,8 +9,8 @@ The project consists of a **Next.js** client application and an analytics servic
 
 ## Environment Requirements
 
-- Node.js (version 20 or higher)
-- Python (version 3.10 or higher)
+- Node.js (version 22 or higher)
+- Python (version 3.12 or higher)
 - PostgreSQL
 - Docker (for containerization)
 

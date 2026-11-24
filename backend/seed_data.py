@@ -3,8 +3,16 @@ import uuid
 import random
 from datetime import datetime, timedelta
 import psycopg
+from dotenv import load_dotenv
 
-DATABASE_URL = "postgresql://postgres:postgres@localhost:5433/analytics_db"
+load_dotenv()
+
+DATABASE_URL = os.environ.get("ANALYTICS_DATABASE_URL", "").strip()
+if not DATABASE_URL:
+    raise RuntimeError("ANALYTICS_DATABASE_URL is not set")
+
+if os.environ.get("ANALYTICS_ALLOW_SEED", "").lower() not in {"1", "true", "yes"}:
+    raise SystemExit("Set ANALYTICS_ALLOW_SEED=1 to seed demo data")
 
 def seed_data():
     now = datetime.now()

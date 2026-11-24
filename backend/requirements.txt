@@ -1,6 +1,6 @@
-fastapi[standard]
-uvicorn
-psycopg[binary,pool]
-pydantic
-python-dotenv
-slowapi
+fastapi[standard]==0.135.2
+uvicorn==0.42.0
+psycopg[binary,pool]==3.2.13
+pydantic==2.11.9
+python-dotenv==1.1.1
+slowapi==0.1.10
