@@ -1,0 +1,2 @@
+# Git hooks must stay LF so sh can execute them on Windows.
+.husky/* text eol=lf
