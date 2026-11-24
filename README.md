@@ -18,9 +18,9 @@ The project consists of a **Next.js** client application and an analytics servic
 
 The project uses split secrets. You need to create `.env` files based on the `.env.example` templates:
 
-1. Create a `.env` file in the root for docker-compose. Set `POSTGRES_PASSWORD` to a strong URL-safe value; Compose requires it and will not start without it.
-2. Create a `frontend/.env` file for frontend variables.
-3. Create a `backend/.env` file and make sure to specify the database connection string.
+1. Create a `.env` file in the root for docker-compose. Set `POSTGRES_PASSWORD` to a strong URL-safe value; Compose requires it and will not start without it. Also set the `NEXT_PUBLIC_*` values used at Docker build time.
+2. Create a `frontend/.env` file for local frontend variables and runtime Navidrome settings.
+3. Create a `backend/.env` file and make sure to specify the database connection string and allowed CORS origins.
 
 ## Running the Backend (FastAPI)
 
