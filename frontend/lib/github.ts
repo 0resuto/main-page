@@ -22,11 +22,17 @@ export interface GitHubRepoData {
   fork: boolean;
 }
 
+export interface GitHubContributionData {
+  date: string;
+  count: number;
+  level: number;
+}
+
 export type GitHubProfilePayload =
   | {
       profile: GitHubProfileData;
       repos: GitHubRepoData[];
-      contributions: any[];
+      contributions: GitHubContributionData[];
       error: null;
     }
   | {
@@ -71,7 +77,9 @@ export async function getGitHubProfilePayload(
 
     const profileData = (await profileRes.json()) as GitHubProfileData;
     const reposData = reposRes.ok ? ((await reposRes.json()) as GitHubRepoData[]) : [];
-    const contribData = contribRes.ok ? await contribRes.json() : { contributions: [] };
+    const contribData = contribRes.ok
+      ? ((await contribRes.json()) as { contributions?: GitHubContributionData[] })
+      : { contributions: [] as GitHubContributionData[] };
 
     if (!profileData?.login) {
       return {

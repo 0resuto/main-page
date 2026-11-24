@@ -36,11 +36,12 @@ export default function Sparkline({
     return `M ${points.join(" L ")}`;
   }, [data, width, height]);
 
+  const reactId = useId();
+  const gradientId = `sparkline-grad-${reactId.replace(/:/g, "")}`;
+
   if (!data || data.length === 0) {
     return <div style={{ width, height }} className="animate-pulse bg-brand-10/5 rounded" />;
   }
-
-  const gradientId = `sparkline-grad-${useId().replace(/:/g, "")}`;
 
   return (
     <svg width={width} height={height} className="overflow-visible" viewBox={`0 0 ${width} ${height}`}>

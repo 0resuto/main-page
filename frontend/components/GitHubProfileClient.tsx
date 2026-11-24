@@ -5,7 +5,7 @@ import { Github, Star } from "lucide-react";
 import Image from "next/image";
 import { ActivityCalendar } from "react-activity-calendar";
 import { Locale, translations } from "../lib/i18n";
-import { GitHubProfileData, GitHubRepoData } from "../lib/github";
+import { GitHubContributionData, GitHubProfileData, GitHubRepoData } from "../lib/github";
 
 export default function GitHubProfileClient({
   locale,
@@ -17,7 +17,7 @@ export default function GitHubProfileClient({
   locale: Locale;
   profile: GitHubProfileData | null;
   repos: GitHubRepoData[];
-  contributions: any[];
+  contributions: GitHubContributionData[];
   error: string | null;
 }) {
   const t = translations[locale].github;
