@@ -2,5 +2,5 @@ npx lint-staged
 npm run typecheck
 git diff --cached --check
 if command -v python >/dev/null 2>&1; then
-  python -m compileall -q backend
+  python scripts/check-python-syntax.py
 fi
