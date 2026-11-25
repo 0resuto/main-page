@@ -29,8 +29,8 @@ const StatCard = ({ value, label, index, icon: Icon, imageUrl, url }: { value: s
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial={{ y: 30 }}
+        whileInView={{ y: 0 }}
         viewport={{ once: true }}
         transition={{ delay: index * 0.1, duration: 0.5 }}
         className={`${baseClasses} hover:-translate-y-2 hover:shadow-2xl hover:z-10 transition-all duration-300 cursor-pointer antialiased`}
@@ -42,8 +42,8 @@ const StatCard = ({ value, label, index, icon: Icon, imageUrl, url }: { value: s
 
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ y: 30 }}
+      whileInView={{ y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.1, duration: 0.5 }}
       className={baseClasses}

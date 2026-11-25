@@ -11,7 +11,7 @@ export default function Hero() {
   const backgroundY = useTransform(scrollY, (y: number) => y * 0.7);
   const textY = useTransform(scrollY, (y: number) => y * 0.5);
   const cardsY = useTransform(scrollY, (y: number) => y * 0.1);
-  const textOpacity = useTransform(scrollY, [0, 500], [1, 0]);
+  const textOpacity = useTransform(scrollY, [0, 120, 500], [1, 1, 0]);
 
   return (
     <section
@@ -22,7 +22,14 @@ export default function Hero() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           className="w-full h-full object-cover"
-          src="/images/hero-bg.webp"
+          src="/images/hero-bg-1920.webp"
+          srcSet="/images/hero-bg-640.webp 640w, /images/hero-bg-1280.webp 1280w, /images/hero-bg-1920.webp 1920w, /images/hero-bg-2560.webp 2560w, /images/hero-bg-3840.webp 3840w"
+          sizes="100vw"
+          width={2560}
+          height={1707}
+          fetchPriority="high"
+          loading="eager"
+          decoding="async"
           alt="Custom Bike Frame"
         />
         <div className="absolute inset-0 bg-black/30"></div>
@@ -31,8 +38,8 @@ export default function Hero() {
       <div className="relative z-10 max-w-7xl mx-auto w-full flex-grow flex flex-col justify-center">
         <motion.div style={{ y: textY, opacity: textOpacity }}>
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ x: -50 }}
+            animate={{ x: 0 }}
             transition={{ duration: 0.8 }}
             className="max-w-3xl"
           >
